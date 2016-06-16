@@ -20,4 +20,12 @@ class ShowPlanController extends Controller
     public function getSubmitPlan() {
         return view("SubmitPlan");
     }
+
+    public function getFinalApproval() {
+        return view("SecondApproval");
+    }
+
+    public function getNotify() {
+        return view("Notify");
+    }
 }

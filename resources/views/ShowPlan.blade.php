@@ -1,7 +1,9 @@
 <html>
 <head>
-    <title>图片2</title>
+    <title>计划停电系统</title>
     <meta charset='utf-8'/>
+    <script type="text/javascript" src="/vendor/jquery/dist/jquery.js"></script>
+    <script src="/asset/js/ajax.js"></script>
     <style type="text/css">
         *{margin:0px;padding:0px;box-sizing:border-box;}
         input[type='button']
@@ -115,14 +117,13 @@
 
         .line11 section
         {
-            width: 340px;
             height: 40px;
             line-height: 40px;
             display: inline-block;
+
         }
         .line12 section
         {
-            width: 340px;
             height: 40px;
             line-height: 40px;
             display: inline-block;
@@ -164,25 +165,28 @@
         }
         input
         {
-            width: 100px;height: 25px;line-height: 25px;
+            height: 25px;line-height: 25px;
+            width: 150px;
         }
 
     </style>
 </head>
 <body>
 <div class="top" id='top'>
-    <p>申请表录人</p>
+    <p>申请表录入</p>
     <p>历史记录查询</p>
 </div>
 <div class="btm" id='btm'>
-    <form>
+    <form id='form1'>
         <div class="line1">
             <table class='table1' border='0' cellspacing='0' cellpadding='0' id='table1'>
                 <tr>
+                    <td>编号</td>
                     <td>填报单位</td>
                     <td>填报日期</td>
                     <td>停电设备名称</td>
-                    <td>计划停电时间</td>
+                    <td>停电开始时间</td>
+                    <td>停电结束时间</td>
                     <td>停电线路名称</td>
                     <td>检修内容</td>
                     <td>备注</td>
@@ -205,6 +209,10 @@
         <div class="line3" id='line3'>
             <div class="line11">
                 <section>
+                    <span>编号</span>
+                    <input type='text' id='a0' disabled>
+                </section>
+                <section>
                     <span>填报单位</span>
                     <input type='text' id='a1'>
                 </section>
@@ -220,39 +228,43 @@
             <div class="line12">
 
                 <section>
-                    <span>计划停电时间</span>
+                    <span>停电开始时间</span>
                     <input type='text' id='a4'>
                 </section>
                 <section>
-                    <span>停电线路名称</span>
+                    <span>停电结束时间</span>
                     <input type='text' id='a5'>
+                </section>
+                <section>
+                    <span>停电线路名称</span>
+                    <input type='text' id='a6'>
                 </section>
 
             </div>
             <div class="line13" id='line13'>
                 <span id='text_span'>检修内容</span>
-                <input type='text' />
+                <input type='text' id='a7' />
             </div>
             <div class="line14">
                 <span>备注</span>
-                <input type='text' id='a6'>
+                <input type='text' id='a8'>
             </div>
             <div class="line15">
                 <span>负责人</span>
-                <input type='text' id='a7'>
+                <input type='text' id='a9'>
                 <span>填报人</span>
-                <input type='text' id='a8'>
+                <input type='text' id='a10'>
             </div>
         </div>
         <div class="line4">
             <input type='button' value='增加' id='add'>
-            <input type='button' value='修改'>
+            <input type='button' id="change" value='修改'>
             <input type='button' value='取消' >
-            <input type='button' value='保存' >
-            <input type='button' value='删除'>
-            <input type='button' value='打印'>
-            <input type='button' value='下一步'>
-            <input type='button' value='返回'>
+            <input type='button' value='保存' id='save' >
+            <input type='button' value='删除' id='delete'>
+            <input type='button' value='打印' id='print'>
+            <input type='button' value='下一步' id='next'>
+            <input type='button' value='返回' id="back">
         </div>
     </form>
 </div>
@@ -272,7 +284,8 @@
             }
             aBtmItem[this.index].style.display ='block'
         }
-    }</script><!--控制顶部两个p点击下面两个form切换代码-->
+    }
+</script>
 <script type="text/javascript">
     var oTable1 = document.getElementById("table1");
     var oLine3 = document.getElementById("line3");
@@ -283,22 +296,192 @@
     var idNum =0;
     oAddBtn.onclick = function ()
     {
-        /*
-         for(var i=0;i<oLine3Input.length;i++)
-         {
-         addArr.push(oLine3Input[i].value)
-         }
-         */
-        //console.log(addArr) 在这里获取到了所有用户输入的信息
+        addMes();
+        console.log(addArr)
+
+        var url1 ="/apply/addApply";
+        $.ajax({
+            type:'post',
+            url :url1,
+            data:{
+
+                "department":$("#a1").val(),
+                "createTime":$("#a2").val(),
+                "mechineNmae":$("#a3").val(),
+                "startTime":$("#a4").val(),
+                "stopTime":$("#a5").val(),
+                "lineName":$("#a6").val(),
+                "description":$("#a7").val(),
+                "comments":$("#a8").val(),
+                "owner":$("#a9").val(),
+                "applyUser":$("#a10").val()
+            },
+            success:function (str){console.log(str)}
+        })
+
+        addArr.length =0;
+    }
+    function addMes()
+    {
         var oTr = '<tr>'
-        idNum++;
         for(var j =0;j<oLine3Input.length;j++)
         {
             //console.log(oLine3Input[j].value)
             oTr+= '<td>'+oLine3Input[j].value+'</td>'
         }
         oTr+='</tr>'
-        oTable1.innerHTML +=oTr;
+        oTable1.innerHTML += oTr ;
+
+        var oTable = document.getElementById("table1")
+        var oTer = oTable.getElementsByTagName("tr")
+        for(var i=0;i<oTer.length;i++)
+        {
+            oTer[i].index = i;
+            oTer[i].onclick = function ()
+            {
+                var father = this.parentNode.parentNode
+                alert(this.index)
+            }
+        }
+    }
+
+</script>
+<script type="text/javascript">
+    window.onload  = showMes();
+    var oTable = document.getElementById("table1")
+    function showMes()
+    {
+        $.ajax({
+            url:'/getApplies',
+            success:function (str)
+            {
+                for(var i=0;i<str.applies.length;i++)
+                {
+                    //str.applies[i].department
+                    var oTr = '<tr>'
+                    oTr+= '<td>'+str.applies[i].id+'</td>'
+                    oTr+= '<td>'+str.applies[i].department+'</td>'
+                    oTr+= '<td>'+str.applies[i].createTime+'</td>'
+                    oTr+= '<td>'+str.applies[i].machineName+'</td>'
+                    oTr+= '<td>'+str.applies[i].startTime+'</td>'
+                    oTr+= '<td>'+str.applies[i].stopTime+'</td>'
+                    oTr+= '<td>'+str.applies[i].lineName+'</td>'
+                    oTr+= '<td>'+str.applies[i].description+'</td>'
+                    oTr+= '<td>'+str.applies[i].comments+'</td>'
+                    oTr+= '<td>'+str.ownerName+'</td>'
+                    oTr+= '</tr>'
+                    oTable1.innerHTML +=oTr
+                }
+                var oTable = document.getElementById("table1")
+                var oTr = oTable.getElementsByTagName("tr")
+                var oLine3 = document.getElementById('line3')
+                var oLine3Input = oLine3.getElementsByTagName('input')
+
+                for(var i=0;i<oTr.length;i++)
+                {
+                    oTr[i].index = i;
+                    for(var j=0;j<str.applies.length;j++)
+                    {
+                        oTr[i].name = str.applies[j].id
+                    }
+                    oTr[i].onclick = function ()
+                    {
+                        for(var j=0;j<oTr.length;j++)
+                        {
+                            oTr[j].style.background ='#fff'
+                        }
+                        oTr[this.index].style.background ='#ddd'
+
+                        var oTd = oTr[this.index].getElementsByTagName('td')
+                        for(var j =0;j<oLine3Input.length;j++)
+                        {
+                            oLine3Input[j].value = oTd[j].innerHTML
+                            oLine3Input[0].disabled = true;
+                        }
+                        //console.log(oTd.length)
+                    }
+                }
+                var oChange = document.getElementById('change')
+                oChange.onclick = function ()
+                {
+                    postMes1();
+                    location.reload()
+                }
+                function postMes1 ()
+                {
+                    $.ajax({
+                        url:'/apply/alterApply',
+                        method:'post',
+                        data:
+                        {
+                            "applyId":$("#a0").val(),
+                            "department":$("#a1").val(),
+                            "createTime":$("#a2").val(),
+                            "mechineNmae":$("#a3").val(),
+                            "startTime":$("#a4").val(),
+                            "stopTime":$("#a5").val(),
+                            "lineName":$("#a6").val(),
+                            "description":$("#a7").val(),
+                            "comments":$("#a8").val(),
+                            "owner":$("#a9").val(),
+                            "applyUser":$("#a10").val(),
+                        },
+                        success:function (str){console.log(str)}
+                    })
+                }
+                var oSave = document.getElementById('save')
+                oSave.onclick = function ()
+                {
+                    $.ajax({
+                        url:'/apply/saveApply',
+                        method:'post',
+                        data:
+                        {
+                            "applyId":$("#a0").val()
+                        },
+                        success:function (str)
+                        {
+                            alert(str.msg)
+                            location.reload()
+                        }
+                    })
+                }
+            }
+        })
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    $("#delete").click(function (){
+        $.ajax({
+            url:'/apply/deleteApply',
+            method:'post',
+            data:{
+                "applyId":$("#a0").val()
+            },
+            success:function (str)
+            {
+                alert(str.msg)
+                location.reload()
+            }
+        })
+    })
+</script>
+<script type="text/javascript">
+    var oNext = document.getElementById('next');
+    oNext.onclick = function ()
+    {
+        window.location.href='/firstApproval'
+    }
+</script>
+
+<script type="text/javascript">
+    var oBack = document.getElementById('back');
+    oBack.onclick = function ()
+    {
+        window.location.href='/showWorkFlow'
     }
 </script>
 

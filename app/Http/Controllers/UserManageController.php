@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\User;
+use App\Department;
+use Illuminate\Support\Facades\Input;
 
 class UserManageController extends Controller
 {
@@ -123,6 +125,101 @@ class UserManageController extends Controller
 
         $resData['status'] = "success";
         $resData['approvalUser'] = $rtUsers;
+
+        return $resData;
+    }
+
+    public function getUserByDepartment() {
+        $resData = [];
+
+        $department = Input::get("department");
+
+        $departmentRecord = Department::where("name", "=", $department)->first();
+
+        if ($departmentRecord == null) {
+            $resData['status'] = "failed";
+            $resData['msg'] = "没有该部门";
+
+            return $resData;
+        }
+
+        $users = User::where("department", "=", $departmentRecord->id)->get();
+
+        $resData['status'] = "success";
+        $resData['users'] = $users;
+
+        return $resData;
+    }
+
+    public function alterUserPermission() {
+        $resData = [];
+
+        $currentUserId = $_COOKIE['currentUserId'];
+
+        $currentUser = User::find($currentUserId);
+
+        if ($currentUser->userType != 3) {
+            $resData['status'] = "failed";
+            $resData['msg'] = "你没有权限进行此操作";
+
+            return $resData;
+        }
+
+        $userId = Input::get("userId");
+
+        $user = User::find($userId);
+
+        if ($user == null) {
+            $resData['status'] = "failed";
+            $resData['msg'] = "该用户不存在";
+
+            return $resData;
+        }
+
+        $permission = Input::get('permission');
+
+        $userType = null;
+        if ($permission == "common") {
+            $userType = 1;
+        } else if ($permission == "firstApproval") {
+            $userType = 0;
+        } elseif ($permission == "finalApproval") {
+            $userType = 2;
+        } else {
+            $resData['status'] = "failed";
+            $resData['msg'] = "错误的请求";
+
+            return $resData;
+        }
+
+        $user->userType = $userType;
+
+        $user->save();
+
+        $resData['status'] = "success";
+        $resData['msg'] = "分配权限成功";
+
+        return $resData;
+    }
+
+    public function getAllUser() {
+        $resData = [];
+
+        $currentUserId = $_COOKIE['currentUserId'];
+
+        $currentUser = User::find($currentUserId);
+
+        if ($currentUser->userType != 3) {
+            $resData['status'] = "failed";
+            $resData['msg'] = "你不是管理员,无权限查看系统用户信息";
+
+            return $resData;
+        }
+
+        $allUser = User::where("userType", "!=", 3)->get();
+
+        $resData['status'] = "success";
+        $resData['allUser'] = $allUser;
 
         return $resData;
     }

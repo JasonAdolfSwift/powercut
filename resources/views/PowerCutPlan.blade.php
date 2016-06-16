@@ -1,9 +1,6 @@
 <html>
 <head>
     <title>计划停电系统</title>
-    <?php
-    header("Access-Control-Allow-Origin：*");
-    ?>
     <meta charset='utf-8'/>
     <script type="text/javascript" src="/vendor/jquery/dist/jquery.js"></script>
     <style type="text/css">
@@ -98,7 +95,7 @@
         }
         .line2 input
         {
-            margin:0px 40px;
+            margin:0px 30px;
         }
         .line3
         {
@@ -119,7 +116,7 @@
 
         .line11 section
         {
-            width: 340px;
+            width: 280px;
             height: 40px;
             line-height: 40px;
             display: inline-block;
@@ -183,6 +180,7 @@
         <div class="line1">
             <table class='table1' border='0' cellspacing='0' cellpadding='0' id='table1'>
                 <tr>
+                    <td>编号</td>
                     <td>填报单位</td>
                     <td>填报日期</td>
                     <td>停电设备名称</td>
@@ -210,6 +208,11 @@
         <div class="line3" id='line3'>
             <div class="line11">
                 <section>
+                    <span>编号</span>
+                    <input type="text" id="a10" disabled="true">
+                </section>
+                <section>
+
                     <span>填报单位</span>
                     <input type='text' id='a0'>
                 </section>
@@ -257,11 +260,11 @@
             <input type='button' value='增加' id='add'>
             <input type='button' id="change" value='修改'>
             <input type='button' value='取消' >
-            <input type='button' value='保存' >
+            <input type='button' value='保存' id="save">
             <input type='button' value='删除'>
             <input type='button' value='打印'>
-            <input type='button' value='下一步' onclick="window.open('/firstApproval')"/>
-            <input type='button' value='返回'>
+            <input type='button' value='下一步'id="forward">
+            <input type='button' value='返回' id="back">
         </div>
     </form>
 </div>
@@ -311,7 +314,7 @@
                 "owner":$("#a8").val(),
                 "applyUser":$("#a9").val()
             },
-            success:function (str){console.log(str)}
+            success:function (str){alert(str.msg)}
         })
 
         addArr.length =0;
@@ -354,6 +357,7 @@
                 {
                     //str.applies[i].department
                     var oTr = '<tr name>'
+                    oTr+= '<td>'+str.applies[i].id+'</td>'
                     oTr+= '<td>'+str.applies[i].department+'</td>'
                     oTr+= '<td>'+str.applies[i].createTime+'</td>'
                     oTr+= '<td>'+str.applies[i].machineName+'</td>'
@@ -420,11 +424,40 @@
                 "description":$("#a6").val(),
                 "comments":$("#a7").val(),
                 "owner":$("#a8").val(),
-                "applyUser":$("#a9").val()
+                "applyUser":$("#a9").val(),
+                "applyId":$("#a10").val()
+
             },
-            success:function (str){console.log(str)}
+            success:function (str){alert(str.msg)}
         })
     }
+
+    var oSave = document.getElementById('save')
+    oSave.onclick = function ()
+    {
+        $.ajax({
+            url:'/apply/saveApply',
+            method:'post',
+            data:
+            {
+                "applyId":$("#a10").val()
+            },
+            success:function (str)
+            {
+                alert(str.msg)
+                location.reload()
+            }
+        })
+    }
+    $("#forward").click(function ()
+    {
+        location.href='/firstApproval';
+    })
+
+    $("#back").click(function ()
+    {
+        location.href='/showWorkFlow';
+    })
 </script>
 
 

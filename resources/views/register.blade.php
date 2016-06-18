@@ -41,6 +41,24 @@
                             <input type="text" class="form-control" placeholder="请输入用户名" ng-model="ctrl.domain" id="username" required />
                         </div>
                     </div>
+                    <div class="form-group first-step">
+                        <label class="col-sm-3 control-label">
+                            中文名
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" placeholder="请输入中文名" ng-model="ctrl.domain" id="chinese" required />
+                        </div>
+                    </div>
+                    <div class="form-group first-step">
+                        <label class="col-sm-3 control-label">
+                            单位
+                            <span class="text-danger">*</span>
+                        </label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" placeholder="请输入单位名" ng-model="ctrl.domain" id="department" required />
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">
                             密码
@@ -80,13 +98,22 @@
     $("#subBtn").click(function(){
         var username= $.trim($("#username").val());
         var password= $.trim($("#password").val());
+        var chinese = $.trim($("#chinese").val());
         var confirmPwd=$.trim($("#confirmPwd").val());
-        $.post('/register/create', {username:username,password:password},function(result){
-            if(result.status=='success'){
-                window.location.href=result.url;
-            }else{
-                alert(result.msg);
-            }
+        var department=$.trim($("#department").val());
+        $.post('/register/create',
+                {
+                    username:username,
+                    password:password,
+                    chinese:chinese,
+                    department:department
+                },
+                function(result){
+                    if(result.status=='success'){
+                        window.location.href=result.url;
+                    }else{
+                        alert(result.msg);
+                    }
         },'json');
     })
 </script>

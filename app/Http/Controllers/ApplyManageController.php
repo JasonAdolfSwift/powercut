@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Input;
 
 class ApplyManageController extends Controller
 {
-    //
+    //获取状态为added的所有记录
     public function getApplies() {
         $userId = $_COOKIE['currentUserId'];
 
@@ -136,13 +136,6 @@ class ApplyManageController extends Controller
         if ($applyRecord == null) {
             $resData['status'] = "failed";
             $resData['msg'] = "没有找到相关纪录";
-
-            return $resData;
-        }
-
-        if ($applyRecord->status != "added" && $applyRecord->status != "saved") {
-            $resData['status'] = "failed";
-            $resData['msg'] = "该停电记录已经上报,不允许作出修改";
 
             return $resData;
         }
@@ -312,11 +305,12 @@ class ApplyManageController extends Controller
         return $resData;
     }
 
+    //展示状态为accept的记录
     public function showAccepted() {
         $resData = [];
         $userId = $_COOKIE['currentUserId'];
 
-        $records = Apply::whereRaw(" status = 'reject' or status = 'accept' ")->get();
+        $records = Apply::whereRaw("status = 'reject' or status = 'accept' ")->get();
 
         $resData['status'] = "success";
         $resData['applies'] = $records;
@@ -325,6 +319,7 @@ class ApplyManageController extends Controller
         return $resData;
     }
 
+    //修改状态为reject和accept的记录
     public function alterAcceptedApply() {
         $resData = [];
 
@@ -440,6 +435,7 @@ class ApplyManageController extends Controller
         return $resData;
     }
 
+    //查看所有状态为submited的记录
     public function showSecondSaved() {
         $resData = [];
 
@@ -454,6 +450,7 @@ class ApplyManageController extends Controller
         return $resData;
     }
 
+    //二次审批
     public function finalApproval() {
         $resData = [];
 
@@ -503,7 +500,7 @@ class ApplyManageController extends Controller
 
         return $resData;
     }
-
+//通知用户界面
     public function showApproved() {
         $resData = [];
 
@@ -554,6 +551,7 @@ class ApplyManageController extends Controller
         return $resData;
     }
 
+    //根据时间或地点查询记录
     public function queryByPlaceOrTime() {
         $resData = [];
 

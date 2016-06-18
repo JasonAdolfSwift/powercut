@@ -240,8 +240,7 @@
 </head>
 <body>
 <section class="top" id='top'>
-    <p>申请表录人</p>
-    <p>历史记录查询</p>
+    <p>申请表录入</p>
 </section>
 <section class="btm" id='btm'>
     <form class='page1' style='display:block'>

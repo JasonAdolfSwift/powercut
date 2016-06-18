@@ -11,13 +11,23 @@ use Illuminate\Support\Facades\Input;
 
 class UserManageController extends Controller
 {
-    //
-
+    //注册用户
     public function createUser() {
         $userName = $_POST['username'];
         $password = $_POST['password'];
+        $chinese = $_POST['chinese'];
+        $departmentName = $_POST['department'];
 
         $resData = [];
+
+        $departmentRecord = Department::where("name", "=", $departmentName)->first();
+
+        if ($departmentRecord == null) {
+            $resData['status'] = "failed";
+            $resData['msg'] = "单位不存在,请确认单位名是否填写正确";
+
+            return $resData;
+        }
 
         $user = User::where("name", "=", $userName)->get();
 
@@ -30,10 +40,14 @@ class UserManageController extends Controller
 
         $newUser = new User();
 
+        //创建用户实例,并填充属性
         $newUser->name = $userName;
         $newUser->password = $password;
+        $newUser->chinese = $chinese;
         $newUser->userType = 1;
+        $newUser->department = $departmentRecord->id;
 
+        //在数据库中保存用户信息
         if($newUser->save()) {
             $resData['status'] = "success";
             $resData['msg'] = "注册成功";
@@ -48,22 +62,23 @@ class UserManageController extends Controller
         }
     }
 
+    //用户登录
     public function login() {
 
         $userName = $_POST['username'];
         $password = $_POST['password'];
         $resData = [];
 
-        $user = User::where("name", "=", $userName)->get();
+        $user = User::where("name", "=", $userName)->first();
 
-        if (count($user) == 0) {
+        if ($user == null) {
             $resData['status'] = "failed";
             $resData['msg'] = "用户不存在";
 
             return $resData;
         }
 
-        if ($user[0]->password != $password) {
+        if ($user->password != $password) {
             $resData['status'] = "failed";
             $resData['msg'] = "用户密码错误";
 
@@ -72,11 +87,14 @@ class UserManageController extends Controller
 
         $resData['status'] = "success";
         $resData['msg'] = "登录成功";
-        setcookie("currentUserId", $user[0]->id, 0, "/");
+
+        //把当前登录用户的Id保存在cookies中
+        setcookie("currentUserId", $user->id, 0, "/");
 
         return $resData;
     }
 
+    //修改密码
     public function alterPassword() {
         $resData = [];
 
@@ -92,6 +110,13 @@ class UserManageController extends Controller
         }
 
         $userInstance = User::where("name", "=", $userName)->first();
+
+        if ($userInstance == null) {
+            $resData['status'] = "failed";
+            $resData['msg'] = "用户不存在";
+
+            return $resData;
+        }
 
         if ($oldPassword != $userInstance->password) {
             $resData['status'] = "failed";
@@ -110,6 +135,7 @@ class UserManageController extends Controller
         return $resData;
     }
 
+    //获取所有具有初审权限的用户
     public function getApprovalUser() {
         $resData = [];
 
@@ -129,6 +155,7 @@ class UserManageController extends Controller
         return $resData;
     }
 
+    //根据部门获取用户
     public function getUserByDepartment() {
         $resData = [];
 
@@ -151,9 +178,11 @@ class UserManageController extends Controller
         return $resData;
     }
 
+    //更改用户权限
     public function alterUserPermission() {
         $resData = [];
 
+        //从cookie中获取当前登录用户的ID
         $currentUserId = $_COOKIE['currentUserId'];
 
         $currentUser = User::find($currentUserId);
@@ -202,6 +231,7 @@ class UserManageController extends Controller
         return $resData;
     }
 
+    //获取所有用户(修改用户权限时展示给管理员)
     public function getAllUser() {
         $resData = [];
 
